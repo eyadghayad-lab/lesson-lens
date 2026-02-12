@@ -20,7 +20,9 @@ export const translations: Record<string, any> = {
     correct: "Correct! Well done.",
     incorrect: "Not quite. Try again!",
     copyBtn: "Copy",
-    copied: "Copied to clipboard!"
+    shareBtn: "Share",
+    copied: "Copied to clipboard!",
+    shared: "Shared successfully!"
   },
   ar: {
     heroTitle: "اتعلم بذكاء، ",
@@ -42,7 +44,9 @@ export const translations: Record<string, any> = {
     correct: "صح! برافو عليك.",
     incorrect: "مش بالظبط. حاول تاني!",
     copyBtn: "نسخ",
-    copied: "تم النسخ!"
+    shareBtn: "مشاركة",
+    copied: "تم النسخ!",
+    shared: "تمت المشاركة!"
   },
   "ar-eg": {
     heroTitle: "اتعلم بذكاء، ",
@@ -64,7 +68,9 @@ export const translations: Record<string, any> = {
     correct: "صح! برافو عليك.",
     incorrect: "مش بالظبط. حاول تاني!",
     copyBtn: "نسخ",
-    copied: "تم النسخ!"
+    shareBtn: "مشاركة",
+    copied: "تم النسخ!",
+    shared: "تمت المشاركة!"
   },
   "ar-sy": {
     heroTitle: "اتعلم بذكاء، ",
@@ -86,7 +92,9 @@ export const translations: Record<string, any> = {
     correct: "صح! برافو عليك.",
     incorrect: "مو تماماً. جرب مرة تانية!",
     copyBtn: "نسخ",
-    copied: "تم النسخ!"
+    shareBtn: "مشاركة",
+    copied: "تم النسخ!",
+    shared: "تمت المشاركة!"
   },
   fr: {
     heroTitle: "Apprenez plus intelligemment, ",
@@ -108,7 +116,9 @@ export const translations: Record<string, any> = {
     correct: "Correct ! Bien joué.",
     incorrect: "Pas tout à fait. Réessayez !",
     copyBtn: "Copier",
-    copied: "Copié !"
+    shareBtn: "Partager",
+    copied: "Copié !",
+    shared: "Partagé !"
   },
   es: {
     heroTitle: "Aprende de forma inteligente, ",
@@ -130,7 +140,9 @@ export const translations: Record<string, any> = {
     correct: "¡Correcto! Bien hecho.",
     incorrect: "No del todo. ¡Inténtalo de nuevo!",
     copyBtn: "Copiar",
-    copied: "¡Copiado!"
+    shareBtn: "Compartir",
+    copied: "¡Copiado!",
+    shared: "¡Compartido!"
   },
   de: {
     heroTitle: "Lerne schlauer, ",
@@ -152,6 +164,8 @@ export const translations: Record<string, any> = {
     correct: "Richtig! Gut gemacht.",
     incorrect: "Nicht ganz. Versuche es noch einmal!",
     copyBtn: "Kopieren",
-    copied: "Kopiert!"
+    shareBtn: "Teilen",
+    copied: "Kopiert!",
+    shared: "Geteilt!"
   }
 };

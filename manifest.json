@@ -1,17 +1,39 @@
 
 {
   "short_name": "LessonLens",
-  "name": "LessonLens | بستطالك",
+  "name": "LessonLens | AI Study Companion",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3429/3429153.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3429/3429153.png",
+      "sizes": "192x192",
+      "type": "image/png"
     }
   ],
   "start_url": ".",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "theme_color": "#9333ea",
-  "background_color": "#fdfaff"
+  "background_color": "#fdfaff",
+  "shortcuts": [
+    {
+      "name": "Simplify Lesson",
+      "short_name": "Simplify",
+      "description": "Quickly simplify lesson material",
+      "url": "/?action=simplify",
+      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/3429/3429153.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Summarize Lesson",
+      "short_name": "Summarize",
+      "description": "Instantly summarize long texts",
+      "url": "/?action=summarize",
+      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/3429/3429153.png", "sizes": "192x192" }]
+    }
+  ]
 }

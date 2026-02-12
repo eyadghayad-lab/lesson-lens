@@ -17,11 +17,17 @@ const App: React.FC = () => {
   const [history, setHistory] = useState<LessonContent[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCopyFeedback, setShowCopyFeedback] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const t = translations[selectedLanguage.code] || translations.en;
 
   useEffect(() => {
+    // Check if app is running in standalone (Desktop App) mode
+    if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
+      setIsStandalone(true);
+    }
+
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -131,6 +137,28 @@ const App: React.FC = () => {
     }
   };
 
+  const handleShare = async () => {
+    if (!result) return;
+    
+    const shareText = `LessonLens Summary (${selectedLanguage.nativeName}):\n\n${result}\n\nShared via LessonLens`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'LessonLens Summary',
+          text: shareText,
+          url: window.location.href
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      // Fallback: Copy and show a message
+      handleCopy();
+      alert(t.copied);
+    }
+  };
+
   const handleSpeech = async (textToRead: string) => {
     setLoading(true);
     try {
@@ -187,6 +215,21 @@ const App: React.FC = () => {
       />
       
       <main className="max-w-4xl mx-auto px-4 py-12">
+        {/* Desktop Installation Reminder Banner */}
+        {!isStandalone && (
+          <div className="mb-8 p-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="flex items-center gap-4 text-center md:text-left">
+              <div className="bg-white/20 p-2 rounded-lg">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              </div>
+              <div>
+                <p className="font-bold">Use LessonLens as a Desktop App!</p>
+                <p className="text-xs text-purple-100">Click the install button in the header to pin it to your taskbar.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Toast Notification */}
         {showCopyFeedback && (
           <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 font-bold flex items-center gap-2">
@@ -276,6 +319,13 @@ const App: React.FC = () => {
             <div className="flex justify-between items-start mb-6">
               <h3 className="text-2xl font-bold">{t.yourExplanation}</h3>
               <div className="flex gap-2">
+                <button 
+                  onClick={handleShare}
+                  className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl hover:bg-indigo-100 transition-all"
+                  title={t.shareBtn}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                </button>
                 <button 
                   onClick={handleCopy}
                   className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-2xl hover:bg-slate-100 transition-all"
