@@ -4,7 +4,7 @@ export const translations: Record<string, any> = {
     heroTitle: "Learn Smarter, ",
     heroTitleHighlight: "Not Harder.",
     heroSub: "Paste lesson text, upload photos of notes, or drop PDFs. We'll simplify, summarize, and visualize it for you.",
-    textareaPlaceholder: "Paste your lesson material here...",
+    textareaPlaceholder: "Paste your lesson material here... (Ctrl+Enter to Simplify)",
     uploadBtn: "Upload Files",
     simplifyBtn: "Simplify",
     summarizeBtn: "Summarize",
@@ -18,13 +18,15 @@ export const translations: Record<string, any> = {
     noHistory: "No history items match your search.",
     footerNote: "Learn with ease!",
     correct: "Correct! Well done.",
-    incorrect: "Not quite. Try again!"
+    incorrect: "Not quite. Try again!",
+    copyBtn: "Copy",
+    copied: "Copied to clipboard!"
   },
   ar: {
     heroTitle: "اتعلم بذكاء، ",
     heroTitleHighlight: "مش بمجهود.",
     heroSub: "انسخ درسك، ارفع صور نوتس، أو ملفات PDF. هنبسطهالك، نلخصها، ونشرحها بالصور.",
-    textareaPlaceholder: "حط مادة الدرس هنا...",
+    textareaPlaceholder: "حط مادة الدرس هنا... (Ctrl+Enter للتبسيط)",
     uploadBtn: "ارفع ملفات",
     simplifyBtn: "بسطهالي",
     summarizeBtn: "لخصهالي",
@@ -38,13 +40,15 @@ export const translations: Record<string, any> = {
     noHistory: "مفيش حاجة مطابقة للي بتدور عليه.",
     footerNote: "بستطالك يا بطل!",
     correct: "صح! برافو عليك.",
-    incorrect: "مش بالظبط. حاول تاني!"
+    incorrect: "مش بالظبط. حاول تاني!",
+    copyBtn: "نسخ",
+    copied: "تم النسخ!"
   },
   "ar-eg": {
     heroTitle: "اتعلم بذكاء، ",
     heroTitleHighlight: "مش بمجهود.",
     heroSub: "انسخ درسك، ارفع صور نوتس، أو ملفات PDF. هنبسطهالك، نلخصها، ونشرحها بالصور.",
-    textareaPlaceholder: "حط مادة الدرس هنا...",
+    textareaPlaceholder: "حط مادة الدرس هنا... (Ctrl+Enter للتبسيط)",
     uploadBtn: "ارفع ملفات",
     simplifyBtn: "بسطهالي",
     summarizeBtn: "لخصهالي",
@@ -58,13 +62,15 @@ export const translations: Record<string, any> = {
     noHistory: "مفيش حاجة مطابقة للي بتدور عليه.",
     footerNote: "بستطالك يا بطل!",
     correct: "صح! برافو عليك.",
-    incorrect: "مش بالظبط. حاول تاني!"
+    incorrect: "مش بالظبط. حاول تاني!",
+    copyBtn: "نسخ",
+    copied: "تم النسخ!"
   },
   "ar-sy": {
     heroTitle: "اتعلم بذكاء، ",
     heroTitleHighlight: "مو بتعب.",
     heroSub: "انسخ درسك، ارفع صور نوتس، أو ملفات PDF. رح نبسطلك ياها، نلخصها، ونشرحها بالصور.",
-    textareaPlaceholder: "حط مادة الدرس هون...",
+    textareaPlaceholder: "حط مادة الدرس هون... (Ctrl+Enter للتبسيط)",
     uploadBtn: "ارفع ملفات",
     simplifyBtn: "بسطلي ياها",
     summarizeBtn: "لخصلي ياها",
@@ -78,13 +84,15 @@ export const translations: Record<string, any> = {
     noHistory: "ما في شي بيشبه اللي عم تدور عليه.",
     footerNote: "بستطالك يا بطل!",
     correct: "صح! برافو عليك.",
-    incorrect: "مو تماماً. جرب مرة تانية!"
+    incorrect: "مو تماماً. جرب مرة تانية!",
+    copyBtn: "نسخ",
+    copied: "تم النسخ!"
   },
   fr: {
     heroTitle: "Apprenez plus intelligemment, ",
     heroTitleHighlight: "pas plus durement.",
     heroSub: "Collez le texte de la leçon, téléchargez des photos de notes ou déposez des PDF. Nous allons simplifier, résumer et visualiser pour vous.",
-    textareaPlaceholder: "Collez le matériel de votre leçon ici...",
+    textareaPlaceholder: "Collez votre matériel... (Ctrl+Entrée pour simplifier)",
     uploadBtn: "Télécharger",
     simplifyBtn: "Simplifier",
     summarizeBtn: "Résumer",
@@ -98,13 +106,15 @@ export const translations: Record<string, any> = {
     noHistory: "Aucun élément ne correspond.",
     footerNote: "Apprenez en toute simplicité !",
     correct: "Correct ! Bien joué.",
-    incorrect: "Pas tout à fait. Réessayez !"
+    incorrect: "Pas tout à fait. Réessayez !",
+    copyBtn: "Copier",
+    copied: "Copié !"
   },
   es: {
     heroTitle: "Aprende de forma inteligente, ",
     heroTitleHighlight: "no difícil.",
     heroSub: "Pega el texto de la lección, sube fotos de notas o archivos PDF. Lo simplificaremos, resumiremos y visualizaremos por ti.",
-    textareaPlaceholder: "Pega el material de tu lección aquí...",
+    textareaPlaceholder: "Pega el material... (Ctrl+Enter para simplificar)",
     uploadBtn: "Subir archivos",
     simplifyBtn: "Simplificar",
     summarizeBtn: "Resumir",
@@ -118,13 +128,15 @@ export const translations: Record<string, any> = {
     noHistory: "No hay coincidencias.",
     footerNote: "¡Aprende con facilidad!",
     correct: "¡Correcto! Bien hecho.",
-    incorrect: "No del todo. ¡Inténtalo de nuevo!"
+    incorrect: "No del todo. ¡Inténtalo de nuevo!",
+    copyBtn: "Copiar",
+    copied: "¡Copiado!"
   },
   de: {
     heroTitle: "Lerne schlauer, ",
     heroTitleHighlight: "nicht härter.",
     heroSub: "Lektionstext einfügen, Fotos hochladen oder PDFs ablegen. Wir vereinfachen, fassen zusammen und visualisieren für dich.",
-    textareaPlaceholder: "Hier Lektionsmaterial einfügen...",
+    textareaPlaceholder: "Material einfügen... (Strg+Enter zum Vereinfachen)",
     uploadBtn: "Dateien hochladen",
     simplifyBtn: "Vereinfachen",
     summarizeBtn: "Zusammenfassen",
@@ -138,6 +150,8 @@ export const translations: Record<string, any> = {
     noHistory: "Keine Treffer gefunden.",
     footerNote: "Lerne mit Leichtigkeit!",
     correct: "Richtig! Gut gemacht.",
-    incorrect: "Nicht ganz. Versuche es noch einmal!"
+    incorrect: "Nicht ganz. Versuche es noch einmal!",
+    copyBtn: "Kopieren",
+    copied: "Kopiert!"
   }
 };

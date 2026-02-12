@@ -16,6 +16,7 @@ const App: React.FC = () => {
   const [quizResult, setQuizResult] = useState<QuizQuestion[] | null>(null);
   const [history, setHistory] = useState<LessonContent[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCopyFeedback, setShowCopyFeedback] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const t = translations[selectedLanguage.code] || translations.en;
@@ -27,6 +28,21 @@ const App: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  // Handle Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        if (e.shiftKey) {
+          processLesson('summarize');
+        } else {
+          processLesson('simplify');
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [inputText, uploadedFiles, selectedLanguage]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -107,6 +123,14 @@ const App: React.FC = () => {
     }
   };
 
+  const handleCopy = () => {
+    if (result) {
+      navigator.clipboard.writeText(result);
+      setShowCopyFeedback(true);
+      setTimeout(() => setShowCopyFeedback(false), 2000);
+    }
+  };
+
   const handleSpeech = async (textToRead: string) => {
     setLoading(true);
     try {
@@ -163,6 +187,14 @@ const App: React.FC = () => {
       />
       
       <main className="max-w-4xl mx-auto px-4 py-12">
+        {/* Toast Notification */}
+        {showCopyFeedback && (
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 font-bold flex items-center gap-2">
+            <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+            {t.copied}
+          </div>
+        )}
+
         <section className="text-center mb-12 animate-float">
           <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
             {t.heroTitle} <span className="text-purple-600 dark:text-purple-400">{t.heroTitleHighlight}</span>
@@ -172,7 +204,7 @@ const App: React.FC = () => {
           </p>
         </section>
 
-        <div className="bg-white dark:bg-slate-900/50 rounded-3xl p-6 shadow-2xl shadow-purple-500/5 border border-purple-100 dark:border-purple-900/30 mb-12">
+        <div className="bg-white dark:bg-slate-900/50 rounded-3xl p-6 shadow-2xl shadow-purple-500/5 border border-purple-100 dark:border-purple-900/30 mb-12 group focus-within:ring-2 focus-within:ring-purple-500/50 transition-all">
           <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
@@ -182,7 +214,7 @@ const App: React.FC = () => {
 
           <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-purple-50 dark:border-purple-900/20">
             <div className="flex gap-2">
-              <label className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl hover:bg-purple-100 transition-all font-semibold text-sm">
+              <label className="cursor-pointer flex items-center gap-2 px-4 py-2.5 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl hover:bg-purple-100 transition-all font-bold text-sm">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                 {t.uploadBtn}
                 <input type="file" className="hidden" multiple accept="image/*,application/pdf,text/plain" onChange={handleFileUpload} />
@@ -193,14 +225,14 @@ const App: React.FC = () => {
               <button 
                 onClick={() => processLesson('simplify')}
                 disabled={loading || (inputText.trim() === '' && uploadedFiles.length === 0)}
-                className="px-6 py-2 bg-purple-600 text-white rounded-xl font-bold shadow-lg shadow-purple-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 text-sm"
+                className="px-6 py-2.5 bg-purple-600 text-white rounded-xl font-bold shadow-lg shadow-purple-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 text-sm"
               >
                 {t.simplifyBtn}
               </button>
               <button 
                 onClick={() => processLesson('summarize')}
                 disabled={loading || (inputText.trim() === '' && uploadedFiles.length === 0)}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 text-sm"
+                className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 text-sm"
               >
                 {t.summarizeBtn}
               </button>
@@ -210,7 +242,7 @@ const App: React.FC = () => {
           {uploadedFiles.length > 0 && (
             <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
               {uploadedFiles.map((file, idx) => (
-                <div key={idx} className="relative group rounded-xl border border-purple-100 dark:border-purple-900/30 overflow-hidden bg-slate-50 dark:bg-slate-800/50 p-2">
+                <div key={idx} className="relative group/file rounded-xl border border-purple-100 dark:border-purple-900/30 overflow-hidden bg-slate-50 dark:bg-slate-800/50 p-2">
                   {file.mimeType.startsWith('image/') ? (
                     <img src={file.data} alt={file.name} className="h-20 w-full object-cover rounded-lg" />
                   ) : (
@@ -222,7 +254,7 @@ const App: React.FC = () => {
                   <div className="mt-1 text-[10px] font-medium truncate px-1 text-slate-500 dark:text-slate-400">{file.name}</div>
                   <button 
                     onClick={() => removeFile(idx)}
-                    className="absolute -top-1 -right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-1 -right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-file-hover:opacity-100 transition-opacity"
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
@@ -240,10 +272,17 @@ const App: React.FC = () => {
         )}
 
         {result && !loading && (
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl border border-purple-100 dark:border-purple-900/30 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl border border-purple-100 dark:border-purple-900/30 animate-in fade-in slide-in-from-bottom-4 duration-500 relative group/result">
             <div className="flex justify-between items-start mb-6">
               <h3 className="text-2xl font-bold">{t.yourExplanation}</h3>
               <div className="flex gap-2">
+                <button 
+                  onClick={handleCopy}
+                  className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-2xl hover:bg-slate-100 transition-all"
+                  title={t.copyBtn}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                </button>
                 <button 
                   onClick={() => handleSpeech(result)}
                   className="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-2xl hover:bg-purple-100 transition-all"
@@ -284,7 +323,7 @@ const App: React.FC = () => {
           <div className="mt-8 space-y-4">
             <h3 className="text-2xl font-bold mb-6">{t.quizTitle}</h3>
             {quizResult.map((q, idx) => (
-              <div key={idx} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-purple-100 dark:border-purple-900/30">
+              <div key={idx} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-purple-100 dark:border-purple-900/30 hover:border-purple-400 transition-colors">
                 <p className={`text-lg font-bold mb-4 ${isArabic ? 'text-right' : ''}`}>{idx + 1}. {q.question}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {q.options.map((opt, oIdx) => (
@@ -313,7 +352,7 @@ const App: React.FC = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t.searchPlaceholder}
-                  className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-purple-100 dark:border-purple-900/30 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all shadow-sm"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-purple-100 dark:border-purple-900/30 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all shadow-sm"
                 />
                 <svg className={`w-4 h-4 absolute ${isArabic ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-slate-400`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -330,6 +369,7 @@ const App: React.FC = () => {
                     setUploadedFiles(item.files || []);
                     const foundLang = SUPPORTED_LANGUAGES.find(l => l.code === item.languageCode);
                     if (foundLang) setSelectedLanguage(foundLang);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}>
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 text-xs">
@@ -343,7 +383,7 @@ const App: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <div className="col-span-full py-12 text-center">
+                <div className="col-span-full py-12 text-center bg-slate-50 dark:bg-slate-900/20 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
                   <p className="text-slate-400 font-medium">{t.noHistory}</p>
                 </div>
               )}
