@@ -30,19 +30,15 @@ const App: React.FC = () => {
   const isArabic = selectedLanguage.code.startsWith('ar');
 
   useEffect(() => {
-    // Update document title dynamically
     const baseName = isArabic ? 'بستطهالك' : 'LessonLens';
     document.title = `${baseName} | AI Study Companion`;
 
-    // Detect standalone mode
     const checkStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
     setIsStandalone(checkStandalone);
 
-    // Detect iOS
     const checkIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(checkIOS);
 
-    // Show iOS guide if not installed and on iOS
     if (checkIOS && !checkStandalone) {
       setShowIOSGuide(true);
     }
@@ -54,7 +50,6 @@ const App: React.FC = () => {
     }
   }, [darkMode, selectedLanguage]);
 
-  // Handle Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -68,6 +63,16 @@ const App: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [inputText, uploadedFiles, selectedLanguage]);
+
+  const handleStartApp = () => {
+    setView('app');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleGoHome = () => {
+    setView('landing');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -106,7 +111,6 @@ const App: React.FC = () => {
     if (!inputText && uploadedFiles.length === 0) return;
     setLoading(true);
     
-    // Reset specific results based on mode to provide clean UI
     if (mode !== 'visualize' && mode !== 'quiz') {
       setResult(null);
       setVisualResult(null);
@@ -166,9 +170,7 @@ const App: React.FC = () => {
 
   const handleShare = async () => {
     if (!result) return;
-    
     const shareText = `${isArabic ? 'بستطهالك' : 'LessonLens'} Summary (${selectedLanguage.nativeName}):\n\n${result}\n\nShared via ${isArabic ? 'بستطهالك' : 'LessonLens'}`;
-    
     if (navigator.share) {
       try {
         await navigator.share({
@@ -211,7 +213,6 @@ const App: React.FC = () => {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
       }
       const ctx = audioContextRef.current;
-      
       const dataInt16 = new Int16Array(bytes.buffer);
       const buffer = ctx.createBuffer(1, dataInt16.length, 24000);
       const channelData = buffer.getChannelData(0);
@@ -222,12 +223,10 @@ const App: React.FC = () => {
       const source = ctx.createBufferSource();
       source.buffer = buffer;
       source.connect(ctx.destination);
-      
       source.onended = () => {
         setIsAudioPlaying(false);
         activeSourceRef.current = null;
       };
-
       activeSourceRef.current = source;
       setIsAudioPlaying(true);
       source.start();
@@ -256,11 +255,11 @@ const App: React.FC = () => {
         setDarkMode={setDarkMode} 
         selectedLanguage={selectedLanguage} 
         setSelectedLanguage={setSelectedLanguage}
-        onGoHome={() => setView('landing')}
+        onGoHome={handleGoHome}
       />
       
       {view === 'landing' ? (
-        <LandingPage onStart={() => setView('app')} />
+        <LandingPage onStart={handleStartApp} />
       ) : (
         <main className="max-w-4xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* iOS Install Guide */}
@@ -281,7 +280,6 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {/* Desktop/Android Install Reminder */}
           {!isStandalone && !isIOS && (
             <div className="mb-8 p-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
               <div className="flex items-center gap-4 text-center md:text-left">
@@ -299,7 +297,6 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {/* Toast Notification */}
           {showCopyFeedback && (
             <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 font-bold flex items-center gap-2">
               <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
@@ -400,51 +397,25 @@ const App: React.FC = () => {
               <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
                 <h3 className="text-xl md:text-2xl font-bold">{t.yourExplanation}</h3>
                 <div className="flex flex-wrap gap-2">
-                  <button 
-                    onClick={handleShare}
-                    className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95"
-                    title={t.shareBtn}
-                  >
+                  <button onClick={handleShare} className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95" title={t.shareBtn}>
                     <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
                   </button>
-                  <button 
-                    onClick={handleCopy}
-                    className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-100 transition-all active:scale-95"
-                    title={t.copyBtn}
-                  >
+                  <button onClick={handleCopy} className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-100 transition-all active:scale-95" title={t.copyBtn}>
                     <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
                   </button>
-                  
                   {isAudioPlaying ? (
-                    <button 
-                      onClick={handleStopSpeech}
-                      className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all active:scale-95"
-                      title={t.stopBtn}
-                    >
+                    <button onClick={handleStopSpeech} className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all active:scale-95" title={t.stopBtn}>
                       <svg className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
                     </button>
                   ) : (
-                    <button 
-                      onClick={() => handleSpeech(result)}
-                      className="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl hover:bg-purple-100 transition-all active:scale-95"
-                      title="Listen"
-                    >
+                    <button onClick={() => handleSpeech(result)} className="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl hover:bg-purple-100 transition-all active:scale-95" title="Listen">
                       <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
                     </button>
                   )}
-                  
-                  <button 
-                    onClick={() => processLesson('visualize')}
-                    className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95"
-                    title="Visualize"
-                  >
+                  <button onClick={() => processLesson('visualize')} className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95" title="Visualize">
                     <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                   </button>
-                  <button 
-                    onClick={() => processLesson('quiz')}
-                    className="p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-xl hover:bg-orange-100 transition-all active:scale-95"
-                    title="Quiz"
-                  >
+                  <button onClick={() => processLesson('quiz')} className="p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-xl hover:bg-orange-100 transition-all active:scale-95" title="Quiz">
                     <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </button>
                 </div>
@@ -488,7 +459,6 @@ const App: React.FC = () => {
             <section className="mt-16 md:mt-24">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 px-2">
                 <h4 className="text-sm font-bold uppercase tracking-widest text-slate-400">{t.recentlySimplified}</h4>
-                
                 <div className="relative w-full md:w-64">
                   <input 
                     type="text"
@@ -507,9 +477,7 @@ const App: React.FC = () => {
                 {filteredHistory.length > 0 ? (
                   filteredHistory.map(item => (
                     <div key={item.id} className="group p-4 rounded-2xl bg-white/50 dark:bg-slate-900/30 border border-transparent hover:border-purple-200 dark:hover:border-purple-900 transition-all cursor-pointer active:scale-98" onClick={() => {
-                      // Logic to load history items
                       if (item.mode === 'quiz') {
-                         // Quiz mode history loading
                          gemini.generateQuiz(item.originalText, item.files || [], SUPPORTED_LANGUAGES.find(l => l.code === item.languageCode)?.name || 'English').then(q => setQuizResult(q));
                          setResult(null);
                       } else {
