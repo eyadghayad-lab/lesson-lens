@@ -1,20 +1,58 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
 
-# Run and deploy your AI Studio app
+# 🚀 LessonLens | Study Companion Deployment Guide
 
-This contains everything you need to run your app locally.
+This project is a high-performance, AI-powered study tool built with React and the Google Gemini API. To get this running as a live website on GitHub, follow these steps.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1Klhe22CwksEe6V5hnEnNmJGBuLSwG6Mg
+## 🛠 Prerequisites
+1. A **GitHub Account**.
+2. An **API Key** from [Google AI Studio](https://aistudio.google.com/).
+3. A local development environment (Node.js installed).
 
-## Run Locally
+## 🌍 Quick Start: Hosting on GitHub Pages
 
-**Prerequisites:**  Node.js
+### 1. Create a New Repository
+- Go to [GitHub](https://github.com) and create a new repository named `lessonlens`.
+- Keep it **Public** (required for free GitHub Pages).
 
+### 2. Push Your Code
+If you are using the command line:
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/YOUR_USERNAME/lessonlens.git
+git branch -M main
+git push -u origin main
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### 3. Build Step (Crucial)
+Standard browsers cannot read `.tsx` files directly. You have two options for GitHub Pages:
+
+#### Option A: Simple Static (Best for quick previews)
+For the code to work directly in a browser without a build step, you would need to transpile the `.tsx` to `.js`. However, for the most professional result, we recommend **Vite**.
+
+#### Option B: Using Vite (Recommended)
+1. Initialize a Vite project: `npm create vite@latest . -- --template react-ts`
+2. Move your files into the `src/` folder.
+3. Update `index.html` to point to the correct paths.
+4. Run `npm run build`.
+5. Deploy the `dist/` folder to GitHub Pages.
+
+### 4. Enable GitHub Pages
+1. Go to your repository **Settings** on GitHub.
+2. Click **Pages** in the left sidebar.
+3. Under **Build and deployment**, set the source to **Deploy from a branch**.
+4. Select the `main` branch (or `gh-pages` if you used a build tool) and the folder (`/root` or `/docs`).
+5. Click **Save**.
+
+## 🔑 Handling your API Key
+**Warning:** Do not commit your `.env` file with your real API key to GitHub. It is public.
+Instead:
+1. Use a tool like **Vercel** or **Netlify** if you want to keep the key hidden via environment variables.
+2. Or, update the code to allow users to input their own key if they are using your public link.
+
+## 📱 PWA Support
+This app includes a `manifest.json` and `sw.js`. Once hosted on HTTPS (GitHub Pages provides this automatically), users will see an "Install" prompt on Android and can "Add to Home Screen" on iOS.
+
+---
+*Created with ❤️ for students everywhere.*
