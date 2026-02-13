@@ -6,22 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>LessonLens | AI Study Companion | بستطهالك</title>
   
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Simplify complex lessons, summarize documents, and generate visual study aids instantly with AI.">
-  <meta name="keywords" content="AI, Education, Study, Gemini, Tutor, Learning, Simplify">
-  
-  <!-- Apple/iOS Specific Meta Tags -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="LessonLens">
-  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3429/3429153.png">
-  
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="LessonLens | AI Study Companion">
-  <meta property="og:description" content="Turn complex notes into simple explanations. بستطهالهالك في ثانية!">
-  <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/3429/3429153.png">
-
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3429/3429153.png">
   <meta name="theme-color" content="#9333ea">
@@ -31,6 +15,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Babel to transpile TSX in the browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Load Module Shims for better import map support -->
+  <script async src="https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js"></script>
+
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.40.0",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom": "https://esm.sh/react-dom@^19.2.4",
+    "react-dom/client": "https://esm.sh/react-dom@^19.2.4/client",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+  }
+}
+</script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -42,7 +44,7 @@
           },
           animation: {
             'float': 'float 6s ease-in-out infinite',
-            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'pulse-soft': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           },
           keyframes: {
             float: {
@@ -57,60 +59,20 @@
   <style>
     .bg-aurora {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
+      top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
       background: radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
                   radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.12) 0%, transparent 40%);
       filter: blur(80px);
-      transition: opacity 0.5s ease;
     }
-    .dark .bg-aurora {
-      background: radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.2) 0%, transparent 40%),
-                  radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.2) 0%, transparent 40%);
-    }
-    body {
-      transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      -webkit-tap-highlight-color: transparent;
-    }
+    body { transition: background-color 0.4s ease; }
     .font-arabic { font-family: 'Cairo', sans-serif !important; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #d8b4fe; border-radius: 10px; }
-    .dark ::-webkit-scrollbar-thumb { background: #581c87; }
-    
-    /* Mobile-first touch optimizations */
-    @media (max-width: 640px) {
-      input, textarea, button {
-        font-size: 16px !important; /* Prevents auto-zoom on iOS */
-      }
-    }
   </style>
-<script type="importmap">
-{
-  "imports": {
-    "@google/genai": "https://esm.sh/@google/genai@^1.40.0",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
-  }
-}
-</script>
 </head>
-<body class="bg-[#fdfaff] dark:bg-[#07050a] text-slate-900 dark:text-slate-100 font-sans selection:bg-purple-100 dark:selection:bg-purple-900 selection:text-purple-900 dark:selection:text-purple-100 antialiased">
+<body class="bg-[#fdfaff] dark:bg-[#07050a] text-slate-900 dark:text-slate-100 font-sans antialiased">
   <div class="bg-aurora"></div>
   <div id="root"></div>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(err => {
-          console.warn('Service Worker registration skipped:', err);
-        });
-      });
-    }
-  </script>
-  <script type="module" src="index.tsx"></script>
+
+  <!-- We use text/babel to tell the browser to transpile this script -->
+  <script type="text/babel" data-type="module" data-presets="typescript,react" src="index.tsx"></script>
 </body>
 </html>
