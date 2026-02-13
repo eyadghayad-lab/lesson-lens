@@ -10,8 +10,8 @@ export type Language = {
 
 export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
-  { code: 'ar', name: 'Arabic (Standard)', nativeName: 'العربية', flag: '🇸🇦' },
-  { code: 'ar-eg', name: 'Arabic (Egyptian)', nativeName: 'العامية المصرية', flag: '🇪🇬' },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية (بالمصري)', flag: '🇪🇬' },
+  { code: 'ar-fusha', name: 'Arabic (Eloquent)', nativeName: 'العربية', flag: '🇸🇦' },
   { code: 'ar-sy', name: 'Arabic (Syrian)', nativeName: 'العامية السورية', flag: '🇸🇾' },
   { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
   { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },

@@ -24,7 +24,8 @@ export const simplifyLesson = async (text: string, files: FileAsset[], langName:
   const ai = getAIClient();
   const prompt = `Simplify the following lesson material. 
   The target language is: ${langName}. 
-  - If it's Egyptian Arabic, use a friendly, simplified Egyptian dialect (بستطالهالي). 
+  - If the language is Arabic (Eloquent), use formal, correct, and high-quality Modern Standard Arabic. Avoid any dialects.
+  - If the language is Arabic, use a friendly, simplified Egyptian dialect (بستطهالك). 
   - If it's Syrian Arabic, use a friendly, simplified Syrian dialect (Levantine/شامي). 
   - Otherwise, use clear, simple words for a student in the specified language. 
   Material: ${text}`;
@@ -35,7 +36,7 @@ export const simplifyLesson = async (text: string, files: FileAsset[], langName:
     model: 'gemini-3-flash-preview',
     contents: { parts },
     config: {
-      systemInstruction: `You are a world-class tutor who excels at making complex topics simple. You always respond in ${langName}.`,
+      systemInstruction: `You are a world-class tutor who excels at making complex topics simple. You always respond in ${langName}. If ${langName} is 'Arabic (Eloquent)', you must use impeccable Modern Standard Arabic.`,
     }
   });
 
@@ -58,11 +59,14 @@ export const summarizeLesson = async (text: string, files: FileAsset[], langName
   return response.text || "Summary generation failed.";
 };
 
-export const generateQuiz = async (text: string, langName: string): Promise<any> => {
+export const generateQuiz = async (text: string, files: FileAsset[], langName: string): Promise<any> => {
   const ai = getAIClient();
+  const prompt = `Based on the provided lesson material, generate 3 multiple-choice questions in JSON format. The language of the quiz must be ${langName}. Material: ${text}`;
+  const parts = prepareParts(prompt, files);
+
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `Based on this lesson material: "${text}", generate 3 multiple-choice questions in JSON format. The language of the quiz must be ${langName}.`,
+    contents: { parts },
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -76,7 +80,8 @@ export const generateQuiz = async (text: string, langName: string): Promise<any>
           },
           required: ["question", "options", "correctAnswer"]
         }
-      }
+      },
+      systemInstruction: `You are an educational assessment expert. Create high-quality multiple-choice questions based ONLY on the provided content in ${langName}.`
     }
   });
 

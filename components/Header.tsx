@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { SUPPORTED_LANGUAGES, Language } from '../types';
+import { translations } from '../locales/translations';
 
 interface HeaderProps {
   darkMode: boolean;
@@ -14,6 +15,9 @@ const Header: React.FC<HeaderProps> = ({ darkMode, setDarkMode, selectedLanguage
   const [showInstallBtn, setShowInstallBtn] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const t = translations[selectedLanguage.code] || translations.en;
+  const isArabic = selectedLanguage.code.startsWith('ar');
 
   useEffect(() => {
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -55,11 +59,13 @@ const Header: React.FC<HeaderProps> = ({ darkMode, setDarkMode, selectedLanguage
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
-          <div>
-            <h1 className="text-xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400">
-              LessonLens
+          <div className="flex flex-col">
+            <h1 className={`font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 leading-tight ${isArabic ? 'text-2xl font-arabic' : 'text-xl'}`}>
+              {isArabic ? 'بستطهالك' : 'LessonLens'}
             </h1>
-            <p className="text-[10px] font-arabic font-bold text-purple-400 dark:text-purple-500 -mt-1">بستطالك</p>
+            <p className="text-[10px] font-bold text-purple-400 dark:text-purple-500 -mt-0.5 opacity-80">
+              {isArabic ? 'LessonLens' : 'بستطهالك'}
+            </p>
           </div>
         </div>
 
@@ -70,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, setDarkMode, selectedLanguage
               className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 transition-all border border-indigo-100 dark:border-indigo-800"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-              <span className="hidden sm:inline">Install App</span>
+              <span className="hidden sm:inline">{t.installAppBtn}</span>
             </button>
           )}
 

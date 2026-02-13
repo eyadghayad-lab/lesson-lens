@@ -18,14 +18,31 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCopyFeedback, setShowCopyFeedback] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [showIOSGuide, setShowIOSGuide] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const activeSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
   const t = translations[selectedLanguage.code] || translations.en;
+  const isArabic = selectedLanguage.code.startsWith('ar');
 
   useEffect(() => {
-    // Check if app is running in standalone (Desktop App) mode
-    if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
-      setIsStandalone(true);
+    // Update document title dynamically
+    const baseName = isArabic ? 'بستطهالك' : 'LessonLens';
+    document.title = `${baseName} | AI Study Companion`;
+
+    // Detect standalone mode
+    const checkStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+    setIsStandalone(checkStandalone);
+
+    // Detect iOS
+    const checkIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(checkIOS);
+
+    // Show iOS guide if not installed and on iOS
+    if (checkIOS && !checkStandalone) {
+      setShowIOSGuide(true);
     }
 
     if (darkMode) {
@@ -33,7 +50,7 @@ const App: React.FC = () => {
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [darkMode]);
+  }, [darkMode, selectedLanguage]);
 
   // Handle Keyboard Shortcuts
   useEffect(() => {
@@ -86,9 +103,17 @@ const App: React.FC = () => {
   const processLesson = async (mode: LessonMode) => {
     if (!inputText && uploadedFiles.length === 0) return;
     setLoading(true);
-    setResult(null);
-    setVisualResult(null);
-    setQuizResult(null);
+    
+    // Reset specific results based on mode to provide clean UI
+    if (mode !== 'visualize' && mode !== 'quiz') {
+      setResult(null);
+      setVisualResult(null);
+      setQuizResult(null);
+    } else if (mode === 'quiz') {
+      setQuizResult(null);
+    } else if (mode === 'visualize') {
+      setVisualResult(null);
+    }
 
     try {
       let output: any = null;
@@ -102,11 +127,11 @@ const App: React.FC = () => {
           setResult(output);
           break;
         case 'quiz':
-          output = await gemini.generateQuiz(inputText, selectedLanguage.name);
+          output = await gemini.generateQuiz(inputText, uploadedFiles, selectedLanguage.name);
           setQuizResult(output);
           break;
         case 'visualize':
-          output = await gemini.visualizeConcept(inputText);
+          output = await gemini.visualizeConcept(inputText || result || "");
           setVisualResult(output);
           break;
       }
@@ -140,12 +165,12 @@ const App: React.FC = () => {
   const handleShare = async () => {
     if (!result) return;
     
-    const shareText = `LessonLens Summary (${selectedLanguage.nativeName}):\n\n${result}\n\nShared via LessonLens`;
+    const shareText = `${isArabic ? 'بستطهالك' : 'LessonLens'} Summary (${selectedLanguage.nativeName}):\n\n${result}\n\nShared via ${isArabic ? 'بستطهالك' : 'LessonLens'}`;
     
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'LessonLens Summary',
+          title: isArabic ? 'بستطهالك' : 'LessonLens Summary',
           text: shareText,
           url: window.location.href
         });
@@ -153,13 +178,24 @@ const App: React.FC = () => {
         console.error('Error sharing:', err);
       }
     } else {
-      // Fallback: Copy and show a message
       handleCopy();
-      alert(t.copied);
+    }
+  };
+
+  const handleStopSpeech = () => {
+    if (activeSourceRef.current) {
+      activeSourceRef.current.stop();
+      activeSourceRef.current = null;
+      setIsAudioPlaying(false);
     }
   };
 
   const handleSpeech = async (textToRead: string) => {
+    if (isAudioPlaying) {
+      handleStopSpeech();
+      return;
+    }
+
     setLoading(true);
     try {
       const base64 = await gemini.textToSpeech(textToRead, selectedLanguage.name);
@@ -184,6 +220,14 @@ const App: React.FC = () => {
       const source = ctx.createBufferSource();
       source.buffer = buffer;
       source.connect(ctx.destination);
+      
+      source.onended = () => {
+        setIsAudioPlaying(false);
+        activeSourceRef.current = null;
+      };
+
+      activeSourceRef.current = source;
+      setIsAudioPlaying(true);
       source.start();
     } catch (err) {
       console.error(err);
@@ -192,8 +236,6 @@ const App: React.FC = () => {
       setLoading(false);
     }
   };
-
-  const isArabic = selectedLanguage.code.startsWith('ar');
 
   const filteredHistory = history.filter(item => {
     const query = searchQuery.toLowerCase();
@@ -214,17 +256,38 @@ const App: React.FC = () => {
         setSelectedLanguage={setSelectedLanguage} 
       />
       
-      <main className="max-w-4xl mx-auto px-4 py-12">
-        {/* Desktop Installation Reminder Banner */}
-        {!isStandalone && (
+      <main className="max-w-4xl mx-auto px-4 py-8 md:py-12">
+        {/* iOS Install Guide */}
+        {showIOSGuide && (
+          <div className="mb-6 p-4 bg-white dark:bg-slate-900 border-2 border-purple-500 rounded-2xl shadow-xl animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="flex items-start gap-4">
+              <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-xl">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2-2v14a2 2 0 002 2z" /></svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-slate-900 dark:text-white">{t.iosInstallTitle}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t.iosInstallDesc}</p>
+              </div>
+              <button onClick={() => setShowIOSGuide(false)} className="text-slate-400 hover:text-slate-600">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Desktop/Android Install Reminder */}
+        {!isStandalone && !isIOS && (
           <div className="mb-8 p-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
             <div className="flex items-center gap-4 text-center md:text-left">
               <div className="bg-white/20 p-2 rounded-lg">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
               </div>
-              <div>
-                <p className="font-bold">Use LessonLens as a Desktop App!</p>
-                <p className="text-xs text-purple-100">Click the install button in the header to pin it to your taskbar.</p>
+              <div className="flex-1">
+                <p className="font-bold">{t.installBannerTitle}</p>
+                <p className="text-xs text-purple-100">{t.installBannerDesc}</p>
+              </div>
+              <div className="shrink-0 p-2 bg-white/20 rounded-xl">
+                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
               </div>
             </div>
           </div>
@@ -238,46 +301,53 @@ const App: React.FC = () => {
           </div>
         )}
 
-        <section className="text-center mb-12 animate-float">
-          <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
+        <section className="text-center mb-8 md:mb-12 animate-float px-2">
+          <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
             {t.heroTitle} <span className="text-purple-600 dark:text-purple-400">{t.heroTitleHighlight}</span>
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-lg max-w-xl mx-auto font-medium">
+          <p className="text-slate-500 dark:text-slate-400 text-base md:text-lg max-w-xl mx-auto font-medium">
             {t.heroSub}
           </p>
         </section>
 
-        <div className="bg-white dark:bg-slate-900/50 rounded-3xl p-6 shadow-2xl shadow-purple-500/5 border border-purple-100 dark:border-purple-900/30 mb-12 group focus-within:ring-2 focus-within:ring-purple-500/50 transition-all">
+        <div className="bg-white dark:bg-slate-900/50 rounded-3xl p-4 md:p-6 shadow-2xl shadow-purple-500/5 border border-purple-100 dark:border-purple-900/30 mb-8 md:mb-12 group focus-within:ring-2 focus-within:ring-purple-500/50 transition-all">
           <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder={t.textareaPlaceholder}
-            className={`w-full h-40 bg-transparent resize-none border-none focus:ring-0 text-lg text-slate-700 dark:text-slate-200 placeholder-slate-400 ${isArabic ? 'text-right' : ''}`}
+            className={`w-full h-32 md:h-40 bg-transparent resize-none border-none focus:ring-0 text-base md:text-lg text-slate-700 dark:text-slate-200 placeholder-slate-400 ${isArabic ? 'text-right' : ''}`}
           />
 
-          <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-purple-50 dark:border-purple-900/20">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mt-4 pt-4 border-t border-purple-50 dark:border-purple-900/20">
             <div className="flex gap-2">
-              <label className="cursor-pointer flex items-center gap-2 px-4 py-2.5 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl hover:bg-purple-100 transition-all font-bold text-sm">
+              <label className="flex-1 sm:flex-none cursor-pointer flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl hover:bg-purple-100 transition-all font-bold text-sm">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                 {t.uploadBtn}
-                <input type="file" className="hidden" multiple accept="image/*,application/pdf,text/plain" onChange={handleFileUpload} />
+                <input type="file" className="hidden" multiple accept="image/*,application/pdf,text/plain,video/*" onChange={handleFileUpload} />
               </label>
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button 
                 onClick={() => processLesson('simplify')}
                 disabled={loading || (inputText.trim() === '' && uploadedFiles.length === 0)}
-                className="px-6 py-2.5 bg-purple-600 text-white rounded-xl font-bold shadow-lg shadow-purple-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 text-sm"
+                className="flex-1 sm:flex-none px-6 py-2.5 bg-purple-600 text-white rounded-xl font-bold shadow-lg shadow-purple-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 text-sm"
               >
                 {t.simplifyBtn}
               </button>
               <button 
                 onClick={() => processLesson('summarize')}
                 disabled={loading || (inputText.trim() === '' && uploadedFiles.length === 0)}
-                className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 text-sm"
+                className="flex-1 sm:flex-none px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 text-sm"
               >
                 {t.summarizeBtn}
+              </button>
+              <button 
+                onClick={() => processLesson('quiz')}
+                disabled={loading || (inputText.trim() === '' && uploadedFiles.length === 0)}
+                className="flex-1 sm:flex-none px-6 py-2.5 bg-orange-600 text-white rounded-xl font-bold shadow-lg shadow-orange-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 text-sm"
+              >
+                {t.quizBtn}
               </button>
             </div>
           </div>
@@ -288,6 +358,11 @@ const App: React.FC = () => {
                 <div key={idx} className="relative group/file rounded-xl border border-purple-100 dark:border-purple-900/30 overflow-hidden bg-slate-50 dark:bg-slate-800/50 p-2">
                   {file.mimeType.startsWith('image/') ? (
                     <img src={file.data} alt={file.name} className="h-20 w-full object-cover rounded-lg" />
+                  ) : file.mimeType.startsWith('video/') ? (
+                    <div className="h-20 w-full flex flex-col items-center justify-center gap-1 bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-lg">
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                      <span className="text-[10px] font-bold uppercase">{file.name.split('.').pop()}</span>
+                    </div>
                   ) : (
                     <div className="h-20 w-full flex flex-col items-center justify-center gap-1 text-purple-600 dark:text-purple-400">
                       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
@@ -297,7 +372,7 @@ const App: React.FC = () => {
                   <div className="mt-1 text-[10px] font-medium truncate px-1 text-slate-500 dark:text-slate-400">{file.name}</div>
                   <button 
                     onClick={() => removeFile(idx)}
-                    className="absolute -top-1 -right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-file-hover:opacity-100 transition-opacity"
+                    className="absolute -top-1 -right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-100 transition-opacity"
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
@@ -315,72 +390,84 @@ const App: React.FC = () => {
         )}
 
         {result && !loading && (
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl border border-purple-100 dark:border-purple-900/30 animate-in fade-in slide-in-from-bottom-4 duration-500 relative group/result">
-            <div className="flex justify-between items-start mb-6">
-              <h3 className="text-2xl font-bold">{t.yourExplanation}</h3>
-              <div className="flex gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-xl border border-purple-100 dark:border-purple-900/30 animate-in fade-in slide-in-from-bottom-4 duration-500 relative group/result mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+              <h3 className="text-xl md:text-2xl font-bold">{t.yourExplanation}</h3>
+              <div className="flex flex-wrap gap-2">
                 <button 
                   onClick={handleShare}
-                  className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl hover:bg-indigo-100 transition-all"
+                  className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95"
                   title={t.shareBtn}
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
                 </button>
                 <button 
                   onClick={handleCopy}
-                  className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-2xl hover:bg-slate-100 transition-all"
+                  className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-100 transition-all active:scale-95"
                   title={t.copyBtn}
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
                 </button>
-                <button 
-                  onClick={() => handleSpeech(result)}
-                  className="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-2xl hover:bg-purple-100 transition-all"
-                  title="Listen"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-                </button>
+                
+                {isAudioPlaying ? (
+                  <button 
+                    onClick={handleStopSpeech}
+                    className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all active:scale-95"
+                    title={t.stopBtn}
+                  >
+                    <svg className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => handleSpeech(result)}
+                    className="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl hover:bg-purple-100 transition-all active:scale-95"
+                    title="Listen"
+                  >
+                    <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                  </button>
+                )}
+                
                 <button 
                   onClick={() => processLesson('visualize')}
-                  className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl hover:bg-indigo-100 transition-all"
+                  className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95"
                   title="Visualize"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 </button>
                 <button 
                   onClick={() => processLesson('quiz')}
-                  className="p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-2xl hover:bg-orange-100 transition-all"
+                  className="p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-xl hover:bg-orange-100 transition-all active:scale-95"
                   title="Quiz"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </button>
               </div>
             </div>
-            <div className={`prose dark:prose-invert prose-purple max-w-none text-lg leading-relaxed whitespace-pre-wrap ${isArabic ? 'text-right' : ''}`}>
+            <div className={`prose dark:prose-invert prose-purple max-w-none text-base md:text-lg leading-relaxed whitespace-pre-wrap ${isArabic ? 'text-right' : ''}`}>
               {result}
             </div>
           </div>
         )}
 
         {visualResult && !loading && (
-          <div className="mt-8 bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl border border-purple-100 dark:border-purple-900/30">
-            <h3 className="text-2xl font-bold mb-6">{t.conceptVisual}</h3>
+          <div className="mt-8 bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-xl border border-purple-100 dark:border-purple-900/30 mb-8">
+            <h3 className="text-xl md:text-2xl font-bold mb-6">{t.conceptVisual}</h3>
             <img src={visualResult} alt="Visualization" className="w-full rounded-2xl shadow-2xl" />
           </div>
         )}
 
         {quizResult && !loading && (
-          <div className="mt-8 space-y-4">
-            <h3 className="text-2xl font-bold mb-6">{t.quizTitle}</h3>
+          <div className="mt-8 space-y-4 mb-8">
+            <h3 className="text-xl md:text-2xl font-bold mb-6">{t.quizTitle}</h3>
             {quizResult.map((q, idx) => (
-              <div key={idx} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-purple-100 dark:border-purple-900/30 hover:border-purple-400 transition-colors">
+              <div key={idx} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-purple-100 dark:border-purple-900/30 hover:border-purple-400 transition-colors shadow-sm">
                 <p className={`text-lg font-bold mb-4 ${isArabic ? 'text-right' : ''}`}>{idx + 1}. {q.question}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {q.options.map((opt, oIdx) => (
                     <button 
                       key={oIdx}
                       onClick={() => alert(oIdx === q.correctAnswer ? t.correct : t.incorrect)}
-                      className={`text-left p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-purple-300 dark:hover:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-all font-medium ${isArabic ? 'text-right' : ''}`}
+                      className={`text-left p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-purple-300 dark:hover:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-all font-medium active:scale-95 ${isArabic ? 'text-right' : ''}`}
                     >
                       {opt}
                     </button>
@@ -392,7 +479,7 @@ const App: React.FC = () => {
         )}
 
         {history.length > 0 && (
-          <section className="mt-24">
+          <section className="mt-16 md:mt-24">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 px-2">
               <h4 className="text-sm font-bold uppercase tracking-widest text-slate-400">{t.recentlySimplified}</h4>
               
@@ -413,8 +500,16 @@ const App: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredHistory.length > 0 ? (
                 filteredHistory.map(item => (
-                  <div key={item.id} className="group p-4 rounded-2xl bg-white/50 dark:bg-slate-900/30 border border-transparent hover:border-purple-200 dark:hover:border-purple-900 transition-all cursor-pointer" onClick={() => {
-                    setResult(item.result || null);
+                  <div key={item.id} className="group p-4 rounded-2xl bg-white/50 dark:bg-slate-900/30 border border-transparent hover:border-purple-200 dark:hover:border-purple-900 transition-all cursor-pointer active:scale-98" onClick={() => {
+                    // Logic to load history items
+                    if (item.mode === 'quiz') {
+                       // Quiz mode history loading
+                       gemini.generateQuiz(item.originalText, item.files || [], SUPPORTED_LANGUAGES.find(l => l.code === item.languageCode)?.name || 'English').then(q => setQuizResult(q));
+                       setResult(null);
+                    } else {
+                       setResult(item.result || null);
+                       setQuizResult(null);
+                    }
                     setInputText(item.originalText);
                     setUploadedFiles(item.files || []);
                     const foundLang = SUPPORTED_LANGUAGES.find(l => l.code === item.languageCode);
@@ -422,12 +517,14 @@ const App: React.FC = () => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 text-xs">
+                      <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 text-xs shrink-0">
                         {SUPPORTED_LANGUAGES.find(l => l.code === item.languageCode)?.flag || '🌍'}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className={`font-bold truncate ${isArabic ? 'text-right' : ''}`}>{item.originalText.substring(0, 40) || 'Document'}...</p>
-                        <p className={`text-xs text-slate-400 ${isArabic ? 'text-right' : ''}`}>{new Date(item.timestamp).toLocaleTimeString()}</p>
+                        <p className={`text-xs text-slate-400 ${isArabic ? 'text-right' : ''}`}>
+                          {item.mode.charAt(0).toUpperCase() + item.mode.slice(1)} • {new Date(item.timestamp).toLocaleTimeString()}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -442,8 +539,8 @@ const App: React.FC = () => {
         )}
       </main>
 
-      <footer className="py-12 text-center text-slate-400 text-sm">
-        <p>© {new Date().getFullYear()} LessonLens. All rights reserved.</p>
+      <footer className="py-12 text-center text-slate-400 text-sm px-4">
+        <p>© {new Date().getFullYear()} {isArabic ? 'بستطهالك' : 'LessonLens'}. All rights reserved.</p>
         <p className="font-bold mt-1">{t.footerNote}</p>
       </footer>
     </div>

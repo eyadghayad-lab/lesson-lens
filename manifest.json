@@ -7,11 +7,17 @@
       "src": "https://cdn-icons-png.flaticon.com/512/3429/3429153.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3429/3429153.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3429/3429153.png",
+      "sizes": "180x180",
       "type": "image/png"
     }
   ],
@@ -20,6 +26,8 @@
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "theme_color": "#9333ea",
   "background_color": "#fdfaff",
+  "orientation": "portrait",
+  "scope": "/",
   "shortcuts": [
     {
       "name": "Simplify Lesson",

@@ -1,5 +1,5 @@
 {
-  "name": "LessonLens | بستطالك",
+  "name": "LessonLens | بستطهالك",
   "description": "An AI-powered educational companion that simplifies complex lessons, summarizes study materials, and generates visual aids using the Gemini API.",
   "requestFramePermissions": [
     "camera",
