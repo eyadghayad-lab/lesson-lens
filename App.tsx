@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import LandingPage from './components/LandingPage';
 import { LessonContent, LessonMode, QuizQuestion, FileAsset, SUPPORTED_LANGUAGES, Language } from './types';
@@ -7,7 +8,7 @@ import * as gemini from './services/geminiService';
 import { translations } from './locales/translations';
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'landing' | 'app'>('landing');
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [inputText, setInputText] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<FileAsset[]>([]);
@@ -30,7 +31,7 @@ const App: React.FC = () => {
   const isArabic = selectedLanguage.code.startsWith('ar');
 
   useEffect(() => {
-    const baseName = isArabic ? 'بستطهالك' : 'LessonLens';
+    const baseName = isArabic ? 'بستطهالك' : 'Lesson Lens';
     document.title = `${baseName} | AI Study Companion`;
 
     const checkStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
@@ -65,12 +66,12 @@ const App: React.FC = () => {
   }, [inputText, uploadedFiles, selectedLanguage]);
 
   const handleStartApp = () => {
-    setView('app');
+    navigate('/app');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleGoHome = () => {
-    setView('landing');
+    navigate('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -137,7 +138,7 @@ const App: React.FC = () => {
           setQuizResult(output);
           break;
         case 'visualize':
-          output = await gemini.visualizeConcept(inputText || result || "");
+          output = await gemini.visualizeConcept(inputText || result || "the uploaded document");
           setVisualResult(output);
           break;
       }
@@ -146,7 +147,9 @@ const App: React.FC = () => {
         id: Date.now().toString(),
         originalText: inputText,
         files: [...uploadedFiles],
-        result: typeof output === 'string' ? output : undefined,
+        result: mode === 'simplify' || mode === 'summarize' ? output : undefined,
+        visualUrl: mode === 'visualize' ? output : undefined,
+        quizResult: mode === 'quiz' ? output : undefined,
         mode,
         languageCode: selectedLanguage.code,
         timestamp: Date.now(),
@@ -170,11 +173,11 @@ const App: React.FC = () => {
 
   const handleShare = async () => {
     if (!result) return;
-    const shareText = `${isArabic ? 'بستطهالك' : 'LessonLens'} Summary (${selectedLanguage.nativeName}):\n\n${result}\n\nShared via ${isArabic ? 'بستطهالك' : 'LessonLens'}`;
+    const shareText = `${isArabic ? 'بستطهالك' : 'Lesson Lens'} Summary (${selectedLanguage.nativeName}):\n\n${result}\n\nShared via ${isArabic ? 'بستطهالك' : 'Lesson Lens'}`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: isArabic ? 'بستطهالك' : 'LessonLens Summary',
+          title: isArabic ? 'بستطهالك' : 'Lesson Lens Summary',
           text: shareText,
           url: window.location.href
         });
@@ -258,10 +261,10 @@ const App: React.FC = () => {
         onGoHome={handleGoHome}
       />
       
-      {view === 'landing' ? (
-        <LandingPage onStart={handleStartApp} />
-      ) : (
-        <main className="max-w-4xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <Routes>
+        <Route path="/" element={<LandingPage onStart={handleStartApp} selectedLanguage={selectedLanguage} />} />
+        <Route path="/app" element={
+          <main className="max-w-4xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* iOS Install Guide */}
           {showIOSGuide && (
             <div className="mb-6 p-4 bg-white dark:bg-slate-900 border-2 border-purple-500 rounded-2xl shadow-xl animate-in fade-in slide-in-from-top-4 duration-500">
@@ -408,14 +411,14 @@ const App: React.FC = () => {
                       <svg className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
                     </button>
                   ) : (
-                    <button onClick={() => handleSpeech(result)} className="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl hover:bg-purple-100 transition-all active:scale-95" title="Listen">
+                    <button onClick={() => handleSpeech(result)} className="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl hover:bg-purple-100 transition-all active:scale-95" title={t.listenBtn}>
                       <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
                     </button>
                   )}
-                  <button onClick={() => processLesson('visualize')} className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95" title="Visualize">
+                  <button onClick={() => processLesson('visualize')} className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95" title={t.visualizeBtn}>
                     <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                   </button>
-                  <button onClick={() => processLesson('quiz')} className="p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-xl hover:bg-orange-100 transition-all active:scale-95" title="Quiz">
+                  <button onClick={() => processLesson('quiz')} className="p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-xl hover:bg-orange-100 transition-all active:scale-95" title={t.quizBtn}>
                     <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </button>
                 </div>
@@ -478,11 +481,17 @@ const App: React.FC = () => {
                   filteredHistory.map(item => (
                     <div key={item.id} className="group p-4 rounded-2xl bg-white/50 dark:bg-slate-900/30 border border-transparent hover:border-purple-200 dark:hover:border-purple-900 transition-all cursor-pointer active:scale-98" onClick={() => {
                       if (item.mode === 'quiz') {
-                         gemini.generateQuiz(item.originalText, item.files || [], SUPPORTED_LANGUAGES.find(l => l.code === item.languageCode)?.name || 'English').then(q => setQuizResult(q));
+                         setQuizResult(item.quizResult || null);
                          setResult(null);
+                         setVisualResult(null);
+                      } else if (item.mode === 'visualize') {
+                         setVisualResult(item.visualUrl || null);
+                         setResult(null);
+                         setQuizResult(null);
                       } else {
                          setResult(item.result || null);
                          setQuizResult(null);
+                         setVisualResult(null);
                       }
                       setInputText(item.originalText);
                       setUploadedFiles(item.files || []);
@@ -512,10 +521,11 @@ const App: React.FC = () => {
             </section>
           )}
         </main>
-      )}
+        } />
+      </Routes>
 
       <footer className="py-12 text-center text-slate-400 text-sm px-4">
-        <p>© {new Date().getFullYear()} {isArabic ? 'بستطهالك' : 'LessonLens'}. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} {isArabic ? 'بستطهالك' : 'Lesson Lens'}. All rights reserved.</p>
         <p className="font-bold mt-1">{t.footerNote}</p>
       </footer>
     </div>

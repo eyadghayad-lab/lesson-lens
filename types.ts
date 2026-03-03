@@ -30,6 +30,7 @@ export interface LessonContent {
   files?: FileAsset[];
   result?: string;
   visualUrl?: string;
+  quizResult?: QuizQuestion[];
   audioBlob?: Blob;
   mode: LessonMode;
   languageCode: string;

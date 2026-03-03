@@ -65,10 +65,10 @@ const Header: React.FC<HeaderProps> = ({ darkMode, setDarkMode, selectedLanguage
           </button>
           <div className="flex flex-col">
             <h1 className={`font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 leading-tight ${isArabic ? 'text-2xl font-arabic' : 'text-xl'}`}>
-              {isArabic ? 'بستطهالك' : 'LessonLens'}
+              {isArabic ? 'بستطهالك' : 'Lesson Lens'}
             </h1>
             <p className="text-[10px] font-bold text-purple-400 dark:text-purple-500 -mt-0.5 opacity-80">
-              {isArabic ? 'LessonLens' : 'بستطهالك'}
+              {isArabic ? 'Lesson Lens' : 'بستطهالك'}
             </p>
           </div>
         </div>

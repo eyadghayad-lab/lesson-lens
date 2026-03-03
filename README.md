@@ -1,5 +1,5 @@
 
-# 🚀 LessonLens | Study Companion Deployment Guide
+# 🚀 invicible | Study Companion Deployment Guide
 
 This project is a high-performance, AI-powered study tool built with React and the Google Gemini API. To host this live on GitHub Pages, follow these steps.
 
@@ -31,7 +31,7 @@ To ensure the app works on GitHub Pages (which hosts in a subfolder like `/lesso
 5. Save and wait 2 minutes for your site to go live.
 
 ## 📱 Installation (PWA)
-Once hosted on HTTPS (which GitHub provides), you can install LessonLens:
+Once hosted on HTTPS (which GitHub provides), you can install invicible:
 - **Mobile**: Tap 'Install' in the header or 'Add to Home Screen'.
 - **Desktop**: Click the install icon in your browser's address bar.
 

@@ -1,35 +1,40 @@
 
 import React from 'react';
+import { Language } from '../types';
+import { translations } from '../locales/translations';
 
 interface LandingPageProps {
   onStart: () => void;
+  selectedLanguage: Language;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onStart, selectedLanguage }) => {
+  const t = translations[selectedLanguage.code] || translations.en;
+  
   return (
     <div className="min-h-screen selection:bg-purple-100 selection:text-purple-900">
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-6 relative overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-block px-4 py-1.5 mb-6 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs font-black uppercase tracking-widest animate-pulse">
-            New: Video Analysis Support
+            {t.landingNewBadge}
           </div>
           <h1 className="text-5xl md:text-7xl font-black mb-8 leading-[1.1] tracking-tight text-slate-900 dark:text-white">
-            Understand Anything <br/> 
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600">In Seconds.</span>
+            {t.landingHeroTitle} <br/> 
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600">{t.landingHeroTitleHighlight}</span>
           </h1>
           <p className="text-xl text-slate-500 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            The all-in-one AI study companion. Upload notes, PDFs, or even videos of lectures to get instant summaries, simplifications, and quizzes.
+            {t.landingHeroSub}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button 
               onClick={onStart}
               className="w-full sm:w-auto px-10 py-4 bg-purple-600 text-white rounded-2xl font-black text-lg shadow-2xl shadow-purple-600/40 hover:scale-105 active:scale-95 transition-all"
             >
-              Get Started for Free
+              {t.landingGetStarted}
             </button>
             <a href="#features" className="w-full sm:w-auto px-10 py-4 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md text-slate-600 dark:text-slate-300 rounded-2xl font-bold text-lg hover:bg-white dark:hover:bg-slate-800 transition-all border border-slate-200 dark:border-slate-800">
-              Explore Features
+              {t.landingExplore}
             </a>
           </div>
         </div>
@@ -70,30 +75,30 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       <section id="features" className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black mb-4">Study Power-ups</h2>
-            <p className="text-slate-500">Everything you need to master your material.</p>
+            <h2 className="text-4xl font-black mb-4">{t.landingFeaturesTitle}</h2>
+            <p className="text-slate-500">{t.landingFeaturesSub}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="group p-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-[32px] hover:shadow-2xl hover:shadow-purple-500/10 transition-all border border-slate-200 dark:border-slate-800">
               <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/40 text-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               </div>
-              <h3 className="text-xl font-bold mb-3">Instant Simplify</h3>
-              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Turns high-level academic jargon into language that actually makes sense. Perfect for complex science and law topics.</p>
+              <h3 className="text-xl font-bold mb-3">{t.landingFeature1Title}</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{t.landingFeature1Desc}</p>
             </div>
             <div className="group p-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-[32px] hover:shadow-2xl hover:shadow-indigo-500/10 transition-all border border-slate-200 dark:border-slate-800">
               <div className="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
               </div>
-              <h3 className="text-xl font-bold mb-3">PDF & Video Summaries</h3>
-              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Don't have time for a 1-hour lecture? Upload the video and get a 2-minute bulleted breakdown of the key concepts.</p>
+              <h3 className="text-xl font-bold mb-3">{t.landingFeature2Title}</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{t.landingFeature2Desc}</p>
             </div>
             <div className="group p-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-[32px] hover:shadow-2xl hover:shadow-orange-500/10 transition-all border border-slate-200 dark:border-slate-800">
               <div className="w-14 h-14 bg-orange-100 dark:bg-orange-900/40 text-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </div>
-              <h3 className="text-xl font-bold mb-3">AI Quizzes</h3>
-              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Automatically generates multiple-choice questions based on your material to help you test your recall before the real exam.</p>
+              <h3 className="text-xl font-bold mb-3">{t.landingFeature3Title}</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{t.landingFeature3Desc}</p>
             </div>
           </div>
         </div>
@@ -103,8 +108,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       <section id="languages" className="py-20 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
           <div className="flex-1">
-            <h2 className="text-4xl font-black mb-6 leading-tight">Truly Global. <br/><span className="text-purple-600">Locally Relevant.</span></h2>
-            <p className="text-lg text-slate-500 dark:text-slate-400 mb-8">We believe education should be accessible in the language you speak at home. Our AI supports impeccable Modern Standard Arabic and regional dialects like Egyptian and Syrian.</p>
+            <h2 className="text-4xl font-black mb-6 leading-tight">{t.landingGlobalTitle} <br/><span className="text-purple-600">{t.landingGlobalHighlight}</span></h2>
+            <p className="text-lg text-slate-500 dark:text-slate-400 mb-8">{t.landingGlobalDesc}</p>
             <div className="grid grid-cols-2 gap-4">
                <div className="p-4 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-2xl font-bold text-center border-purple-500/20 border">العربية الفصحى</div>
                <div className="p-4 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-2xl font-bold text-center border border-slate-200 dark:border-slate-800">العامية المصرية</div>
@@ -125,14 +130,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       <section className="py-32 px-6 text-center">
         <div className="max-w-3xl mx-auto bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl p-16 rounded-[48px] shadow-2xl relative overflow-hidden border border-white/50 dark:border-slate-800">
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"></div>
-          <h2 className="text-4xl md:text-5xl font-black mb-8 leading-tight">Ready to ace your next exam?</h2>
+          <h2 className="text-4xl md:text-5xl font-black mb-8 leading-tight">{t.landingCtaTitle}</h2>
           <button 
             onClick={onStart}
             className="inline-block px-12 py-5 bg-purple-600 text-white rounded-2xl font-black text-xl shadow-2xl shadow-purple-600/40 hover:scale-105 active:scale-95 transition-all"
           >
-            Start Studying Now
+            {t.landingCtaBtn}
           </button>
-          <p className="mt-8 text-sm text-slate-400">No account required. Privacy-first AI tutor.</p>
+          <p className="mt-8 text-sm text-slate-400">{t.landingCtaNote}</p>
         </div>
       </section>
     </div>

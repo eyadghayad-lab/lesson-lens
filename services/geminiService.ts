@@ -1,129 +1,102 @@
 
-import { GoogleGenAI, Type, Modality } from "@google/genai";
+import { HfInference } from "@huggingface/inference";
 import { FileAsset } from "../types";
 
-const getAIClient = () => new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+const hf = new HfInference(process.env.HUGGINGFACE_TOKEN || '');
 
-const prepareParts = (text: string, files?: FileAsset[]) => {
-  const parts: any[] = [{ text }];
-  
-  if (files && files.length > 0) {
-    files.forEach(file => {
-      parts.push({
-        inlineData: {
-          mimeType: file.mimeType,
-          data: file.data.split(',')[1],
-        },
-      });
-    });
+// Helper to convert base64 to Blob
+const base64ToBlob = (base64: string, mimeType: string) => {
+  const byteCharacters = atob(base64.split(',')[1]);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
   }
-  return parts;
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], { type: mimeType });
 };
 
 export const simplifyLesson = async (text: string, files: FileAsset[], langName: string): Promise<string> => {
-  const ai = getAIClient();
-  const prompt = `Simplify the following lesson material. 
+  const prompt = `User: Simplify the following lesson material. 
   The target language is: ${langName}. 
-  - If the language is Arabic (Eloquent), use formal, correct, and high-quality Modern Standard Arabic. Avoid any dialects.
-  - If the language is Arabic, use a friendly, simplified Egyptian dialect (بستطهالك). 
-  - If it's Syrian Arabic, use a friendly, simplified Syrian dialect (Levantine/شامي). 
-  - Otherwise, use clear, simple words for a student in the specified language. 
-  Material: ${text}`;
+  - If the language is Arabic (Eloquent), use formal Modern Standard Arabic.
+  - If the language is Arabic, use friendly Egyptian dialect. 
+  - If it's Syrian Arabic, use friendly Syrian dialect. 
+  Material: ${text}
+  Assistant: Here is the simplified explanation in ${langName}:`;
   
-  const parts = prepareParts(prompt, files);
-
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: { parts },
-    config: {
-      systemInstruction: `You are a world-class tutor who excels at making complex topics simple. You always respond in ${langName}. If ${langName} is 'Arabic (Eloquent)', you must use impeccable Modern Standard Arabic.`,
-    }
+  const response = await hf.textGeneration({
+    model: 'mistralai/Mistral-7B-Instruct-v0.2',
+    inputs: prompt,
+    parameters: { max_new_tokens: 1000, return_full_text: false }
   });
 
-  return response.text || "Sorry, I couldn't simplify this material.";
+  return response.generated_text || "Sorry, I couldn't simplify this material.";
 };
 
 export const summarizeLesson = async (text: string, files: FileAsset[], langName: string): Promise<string> => {
-  const ai = getAIClient();
-  const prompt = `Provide a structured summary with bullet points in ${langName} for the following material: ${text}`;
-  const parts = prepareParts(prompt, files);
-
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: { parts },
-    config: {
-      systemInstruction: `You are an expert at extracting key concepts. You always respond in ${langName}.`,
-    }
+  const prompt = `User: Provide a structured summary with bullet points in ${langName} for the following material: ${text}
+  Assistant: Summary:`;
+  
+  const response = await hf.textGeneration({
+    model: 'mistralai/Mistral-7B-Instruct-v0.2',
+    inputs: prompt,
+    parameters: { max_new_tokens: 1000, return_full_text: false }
   });
 
-  return response.text || "Summary generation failed.";
+  return response.generated_text || "Summary generation failed.";
 };
 
 export const generateQuiz = async (text: string, files: FileAsset[], langName: string): Promise<any> => {
-  const ai = getAIClient();
-  const prompt = `Based on the provided lesson material, generate 3 multiple-choice questions in JSON format. The language of the quiz must be ${langName}. Material: ${text}`;
-  const parts = prepareParts(prompt, files);
-
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: { parts },
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.ARRAY,
-        items: {
-          type: Type.OBJECT,
-          properties: {
-            question: { type: Type.STRING },
-            options: { type: Type.ARRAY, items: { type: Type.STRING } },
-            correctAnswer: { type: Type.INTEGER, description: "Index of the correct option (0-3)" }
-          },
-          required: ["question", "options", "correctAnswer"]
-        }
-      },
-      systemInstruction: `You are an educational assessment expert. Create high-quality multiple-choice questions based ONLY on the provided content in ${langName}.`
-    }
+  const prompt = `User: Based on the provided lesson material, generate 3 multiple-choice questions in JSON format. 
+  The language of the quiz must be ${langName}. 
+  Return ONLY a JSON array of objects with "question", "options" (array of 4), and "correctAnswer" (index 0-3).
+  Material: ${text}
+  Assistant: [`;
+  
+  const response = await hf.textGeneration({
+    model: 'mistralai/Mistral-7B-Instruct-v0.2',
+    inputs: prompt,
+    parameters: { max_new_tokens: 1000, return_full_text: false }
   });
 
-  return JSON.parse(response.text || "[]");
+  try {
+    const jsonStr = '[' + response.generated_text;
+    // Basic cleanup in case model adds extra text
+    const match = jsonStr.match(/\[.*\]/s);
+    return JSON.parse(match ? match[0] : jsonStr);
+  } catch (e) {
+    console.error("JSON parse error", e);
+    return [];
+  }
 };
 
 export const visualizeConcept = async (prompt: string): Promise<string> => {
-  const ai = getAIClient();
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash-image',
-    contents: {
-      parts: [{ text: `Create an educational, clean illustration that explains this concept: ${prompt}. Minimalist style, vibrant colors.` }]
-    },
-    config: {
-      imageConfig: { aspectRatio: "1:1" }
-    }
+  const response = await hf.textToImage({
+    model: 'stabilityai/stable-diffusion-xl-base-1.0',
+    inputs: `Educational illustration, clean, minimalist, vibrant colors: ${prompt}`,
   });
 
-  for (const part of response.candidates?.[0]?.content?.parts || []) {
-    if (part.inlineData) {
-      return `data:image/png;base64,${part.inlineData.data}`;
-    }
-  }
-  throw new Error("Image generation failed");
+  const reader = new FileReader();
+  return new Promise((resolve) => {
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.readAsDataURL(response as any);
+  });
 };
 
 export const textToSpeech = async (text: string, langName: string): Promise<string> => {
-  const ai = getAIClient();
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-preview-tts",
-    contents: [{ parts: [{ text: `Read this ${langName} lesson explanation clearly and slowly: ${text}` }] }],
-    config: {
-      responseModalities: [Modality.AUDIO],
-      speechConfig: {
-        voiceConfig: {
-          prebuiltVoiceConfig: { voiceName: langName.includes('Arabic') ? 'Puck' : 'Kore' },
-        },
-      },
-    },
+  // Note: HF TTS models vary. Using a common one.
+  // This is a placeholder as TTS on HF often requires specific models per language.
+  const response = await hf.textToSpeech({
+    model: 'facebook/mms-tts-eng', // Defaulting to English for demo, real implementation would switch
+    inputs: text,
   });
 
-  const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-  if (!base64Audio) throw new Error("Audio generation failed");
-  return base64Audio;
+  const reader = new FileReader();
+  return new Promise((resolve) => {
+    reader.onloadend = () => {
+      const base64 = (reader.result as string).split(',')[1];
+      resolve(base64);
+    };
+    reader.readAsDataURL(response as any);
+  });
 };
