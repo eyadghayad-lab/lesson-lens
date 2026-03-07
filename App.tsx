@@ -57,7 +57,6 @@ const App: React.FC = () => {
   const [selectedBook, setSelectedBook] = useState<any | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
   const [chapterContent, setChapterContent] = useState<string | null>(null);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const activeSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const recognitionRef = useRef<any>(null);
@@ -82,13 +81,6 @@ const App: React.FC = () => {
       setShowIOSGuide(true);
     }
 
-    const handleBeforeInstallPrompt = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
     if (darkMode) {
       document.documentElement.classList.add('dark');
       document.body.classList.add('dark');
@@ -105,10 +97,6 @@ const App: React.FC = () => {
       }
     }
     localStorage.setItem('darkMode', darkMode.toString());
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
   }, [darkMode, selectedLanguage]);
 
   useEffect(() => {
@@ -165,16 +153,8 @@ const App: React.FC = () => {
     setUploadedFiles([]);
     setCurrentLessonId(null);
     setActiveTab('study');
+    navigate('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleInstallApp = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null);
-    }
   };
 
   const handleFetchCurriculum = async () => {
@@ -559,7 +539,7 @@ const App: React.FC = () => {
       />
       
       <Routes>
-        <Route path="/" element={<LandingPage onStart={handleStartApp} selectedLanguage={selectedLanguage} />} />
+        <Route path="/" element={<LandingPage onStart={handleStartApp} onShowLeaderboard={() => setActiveTab('history')} selectedLanguage={selectedLanguage} />} />
         <Route path="/app" element={
           <main className="max-w-4xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* iOS Install Guide */}

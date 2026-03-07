@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SUPPORTED_LANGUAGES, Language } from '../types';
 import { translations } from '../locales/translations';
 
@@ -12,6 +13,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ darkMode, setDarkMode, selectedLanguage, setSelectedLanguage, onGoHome }) => {
+  const navigate = useNavigate();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallBtn, setShowInstallBtn] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -86,7 +88,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, setDarkMode, selectedLanguage
           </button>
 
           <button 
-            onClick={() => window.location.pathname = '/app'}
+            onClick={() => navigate('/app')}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 rounded-lg hover:bg-purple-100 transition-all border border-purple-100 dark:border-purple-800"
           >
              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
