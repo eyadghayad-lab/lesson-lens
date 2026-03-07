@@ -1,6 +1,6 @@
 {
   "name": "LessonLens - بستطهالك",
-  "description": "An AI-powered educational companion that simplifies complex lessons, summarizes study materials, and generates visual aids using the Gemini API.",
+  "description": "An AI-powered educational companion that simplifies complex lessons, summarizes study materials, and generates visual aids. Now featuring an account system and a global leaderboard for the most dedicated students.",
   "requestFramePermissions": [
     "camera",
     "microphone"

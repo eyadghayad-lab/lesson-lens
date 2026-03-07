@@ -16,6 +16,9 @@ export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
   { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
   { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
+  { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹' },
+  { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹' },
+  { code: 'fa', name: 'Farsi', nativeName: 'فارسی', flag: '🇮🇷' },
 ];
 
 export interface FileAsset {
@@ -31,6 +34,8 @@ export interface LessonContent {
   result?: string;
   visualUrl?: string;
   quizResult?: QuizQuestion[];
+  quizScore?: number;
+  userAnswers?: (number | null)[];
   audioBlob?: Blob;
   mode: LessonMode;
   languageCode: string;

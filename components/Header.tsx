@@ -18,6 +18,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, setDarkMode, selectedLanguage
   const menuRef = useRef<HTMLDivElement>(null);
 
   const t = translations[selectedLanguage.code] || translations.en;
+  const isRTL = selectedLanguage.code.startsWith('ar') || selectedLanguage.code === 'fa';
   const isArabic = selectedLanguage.code.startsWith('ar');
 
   useEffect(() => {
@@ -57,18 +58,20 @@ const Header: React.FC<HeaderProps> = ({ darkMode, setDarkMode, selectedLanguage
         <div className="flex items-center gap-2">
           <button 
             onClick={onGoHome}
-            className="w-10 h-10 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 hover:scale-110 transition-transform"
+            className="w-10 h-10 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 hover:scale-110 transition-transform overflow-hidden"
           >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            <svg viewBox="0 0 100 100" className="w-7 h-7 text-white fill-current">
+              <path d="M20 20 L20 80 L80 80 L80 70 L30 70 L30 20 Z" />
+              <circle cx="60" cy="45" r="25" fill="none" stroke="white" strokeWidth="8" />
+              <line x1="78" y1="63" x2="90" y2="75" stroke="white" strokeWidth="8" strokeLinecap="round" />
             </svg>
           </button>
           <div className="flex flex-col">
-            <h1 className={`font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 leading-tight ${isArabic ? 'text-2xl font-arabic' : 'text-xl'}`}>
-              {isArabic ? 'بستطهالك' : 'Lesson Lens'}
+            <h1 className={`font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 leading-tight ${isRTL ? (isArabic ? 'text-2xl font-arabic' : 'text-xl font-sans') : 'text-xl'}`}>
+              {isArabic ? 'بستطهالك' : 'LessonLens'}
             </h1>
             <p className="text-[10px] font-bold text-purple-400 dark:text-purple-500 -mt-0.5 opacity-80">
-              {isArabic ? 'Lesson Lens' : 'بستطهالك'}
+              {isArabic ? 'LessonLens' : 'بستطهالك'}
             </p>
           </div>
         </div>

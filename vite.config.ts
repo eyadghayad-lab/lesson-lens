@@ -14,9 +14,6 @@ export default defineConfig(({ mode }) => {
         react(),
         tailwindcss(),
       ],
-      define: {
-        'process.env.HUGGINGFACE_TOKEN': JSON.stringify(env.HUGGINGFACE_TOKEN),
-      },
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),

@@ -1,12 +1,29 @@
 
-# 🚀 invicible | Study Companion Deployment Guide
+# 🚀 LessonLens | Study Companion Deployment Guide
 
-This project is a high-performance, AI-powered study tool built with React and the Google Gemini API. To host this live on GitHub Pages, follow these steps.
+This project is a high-performance, AI-powered study tool built with React, Hugging Face models, and Firebase.
 
 ## 🛠 Prerequisites
 1. A **GitHub Account**.
-2. An **API Key** from [Google AI Studio](https://aistudio.google.com/).
-3. Use modern browsers (Chrome, Edge, Safari).
+2. An **API Key** from [Hugging Face](https://huggingface.co/settings/tokens).
+3. A **Firebase Project** for the account and leaderboard system.
+4. Use modern browsers (Chrome, Edge, Safari).
+
+## 🔥 Firebase Setup
+To enable the account and leaderboard system, you must set up a Firebase project:
+1. Go to the [Firebase Console](https://console.firebase.google.com/).
+2. Create a new project named "LessonLens".
+3. Enable **Authentication** and activate the **Google Sign-In** provider.
+4. Enable **Cloud Firestore** and create a database in "Production mode" (or test mode for development).
+5. Add a **Web App** to your project and copy the configuration.
+6. Set the following environment variables in your hosting provider (e.g., Vercel, Netlify) or a `.env` file:
+   - `VITE_FIREBASE_API_KEY`
+   - `VITE_FIREBASE_AUTH_DOMAIN`
+   - `VITE_FIREBASE_PROJECT_ID`
+   - `VITE_FIREBASE_STORAGE_BUCKET`
+   - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+   - `VITE_FIREBASE_APP_ID`
+   - `VITE_HUGGINGFACE_TOKEN`
 
 ## 🌍 Hosting on GitHub Pages
 
@@ -31,7 +48,7 @@ To ensure the app works on GitHub Pages (which hosts in a subfolder like `/lesso
 5. Save and wait 2 minutes for your site to go live.
 
 ## 📱 Installation (PWA)
-Once hosted on HTTPS (which GitHub provides), you can install invicible:
+Once hosted on HTTPS (which GitHub provides), you can install LessonLens:
 - **Mobile**: Tap 'Install' in the header or 'Add to Home Screen'.
 - **Desktop**: Click the install icon in your browser's address bar.
 

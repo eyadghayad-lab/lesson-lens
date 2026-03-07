@@ -1,24 +1,19 @@
 
 {
-  "short_name": "invicible",
-  "name": "invicible | AI Study Companion",
+  "short_name": "LessonLens",
+  "name": "LessonLens | AI Study Companion",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3429/3429153.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3429/3429153.png",
-      "sizes": "192x192",
-      "type": "image/png",
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "maskable"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3429/3429153.png",
-      "sizes": "180x180",
-      "type": "image/png"
     }
   ],
   "start_url": ".",
