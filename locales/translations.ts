@@ -78,7 +78,8 @@ export const translations: Record<string, any> = {
     landingGlobalDesc: "We believe education should be accessible in the language you speak at home. Our AI supports impeccable Modern Standard Arabic and regional dialects like Egyptian and Syrian.",
     landingCtaTitle: "Ready to ace your next exam?",
     landingCtaBtn: "Start Studying Now",
-    landingCtaNote: "No account required. Privacy-first AI tutor."
+    landingCtaNote: "No account required. Privacy-first AI tutor.",
+    leaderboardTitle: "View History"
   },
   ar: {
     heroTitle: "اتعلم بذكاء، ",
@@ -158,7 +159,8 @@ export const translations: Record<string, any> = {
     landingGlobalDesc: "مؤمنين إن التعليم لازم يكون متاح باللغة اللي بتتكلم بيها في البيت. الذكاء الاصطناعي بتاعنا بيدعم الفصحى واللهجات زي المصري والسوري.",
     landingCtaTitle: "جاهز تقفل الامتحان الجاي؟",
     landingCtaBtn: "ابدأ مذاكرة دلوقتي",
-    landingCtaNote: "مش محتاج حساب. مدرس ذكي بيحترم خصوصيتك."
+    landingCtaNote: "مش محتاج حساب. مدرس ذكي بيحترم خصوصيتك.",
+    leaderboardTitle: "الدروس القديمة"
   },
   "ar-fusha": {
     heroTitle: "تعلّم بذكاء، ",
@@ -237,7 +239,8 @@ export const translations: Record<string, any> = {
     landingGlobalDesc: "نؤمن بأن التعليم يجب أن يكون متاحاً باللغة التي تتحدث بها في المنزل. يدعم الذكاء الاصطناعي لدينا اللغة العربية الفصحى واللهجات الإقليمية كالمصرية والسورية.",
     landingCtaTitle: "هل أنت مستعد للتفوق في امتحانك القادم؟",
     landingCtaBtn: "ابدأ الدراسة الآن",
-    landingCtaNote: "لا يتطلب حساباً. معلم ذكي يضع الخصوصية أولاً."
+    landingCtaNote: "لا يتطلب حساباً. معلم ذكي يضع الخصوصية أولاً.",
+    leaderboardTitle: "السجل"
   },
   "ar-sy": {
     heroTitle: "اتعلم بذكاء، ",
@@ -313,7 +316,8 @@ export const translations: Record<string, any> = {
     landingGlobalDesc: "مؤمنين إنو التعليم لازم يكون متاح باللغة اللي بتحكي فيها بالبيت. الذكاء الاصطناعي تبعنا بيدعم الفصحى واللهجات متل المصري والسوري.",
     landingCtaTitle: "جاهز تفلل بامتحانك الجاي؟",
     landingCtaBtn: "بلش دراسة هلأ",
-    landingCtaNote: "مو محتاج حساب. أستاذ ذكي بيحترم خصوصيتك."
+    landingCtaNote: "مو محتاج حساب. أستاذ ذكي بيحترم خصوصيتك.",
+    leaderboardTitle: "الدروس القديمة"
   },
   fr: {
     heroTitle: "Apprenez plus intelligemment, ",
@@ -393,7 +397,8 @@ export const translations: Record<string, any> = {
     landingGlobalDesc: "Nous pensons que l'éducation devrait être accessible dans la langue que vous parlez à la maison. Notre IA prend en charge l'arabe standard moderne impeccable et les dialectes régionaux comme l'égyptien et le syrien.",
     landingCtaTitle: "Prêt à réussir votre prochain examen ?",
     landingCtaBtn: "Commencer à étudier maintenant",
-    landingCtaNote: "Aucun compte requis. Tuteur IA respectueux de la vie privée."
+    landingCtaNote: "Aucun compte requis. Tuteur IA respectueux de la vie privée.",
+    leaderboardTitle: "Historique"
   },
   es: {
     heroTitle: "Aprende de forma inteligente, ",
@@ -473,7 +478,8 @@ export const translations: Record<string, any> = {
     landingGlobalDesc: "Creemos que la educación debe ser accesible en el idioma que hablas en casa. Nuestra IA admite un árabe estándar moderno impecable y dialectos regionales como el egipcio y el sirio.",
     landingCtaTitle: "¿Listo para aprobar tu próximo examen?",
     landingCtaBtn: "Comenzar a estudiar ahora",
-    landingCtaNote: "No se requiere cuenta. Tutor de IA que prioriza la privacidad."
+    landingCtaNote: "No se requiere cuenta. Tutor de IA que prioriza la privacidad.",
+    leaderboardTitle: "Historial"
   },
   de: {
     heroTitle: "Lerne schlauer, ",
@@ -550,7 +556,8 @@ export const translations: Record<string, any> = {
     landingGlobalDesc: "Wir glauben, dass Bildung in der Sprache zugänglich sein sollte, die du zu Hause sprichst. Unsere KI unterstützt makelloses modernes Hocharabisch und regionale Dialekte wie Ägyptisch und Syrisch.",
     landingCtaTitle: "Bereit, deine nächste Prüfung zu bestehen?",
     landingCtaBtn: "Jetzt mit dem Lernen beginnen",
-    landingCtaNote: "Kein Konto erforderlich. Datenschutzorientierter KI-Tutor."
+    landingCtaNote: "Kein Konto erforderlich. Datenschutzorientierter KI-Tutor.",
+    leaderboardTitle: "Verlauf"
   },
   fa: {
     heroTitle: "هوشمندانه یاد بگیرید، ",
@@ -630,7 +637,8 @@ export const translations: Record<string, any> = {
     landingGlobalDesc: "ما معتقدیم آموزش باید به زبانی که در خانه صحبت می‌کنید در دسترس باشد. هوش مصنوعی ما از زبان‌های مختلف پشتیبانی می‌کند.",
     landingCtaTitle: "آماده‌اید در امتحان بعدی خود موفق شوید؟",
     landingCtaBtn: "همین حالا مطالعه را شروع کنید",
-    landingCtaNote: "بدون نیاز به حساب کاربری. معلم هوش مصنوعی با اولویت حریم خصوصی."
+    landingCtaNote: "بدون نیاز به حساب کاربری. معلم هوش مصنوعی با اولویت حریم خصوصی.",
+    leaderboardTitle: "تاریخچه"
   },
   it: {
     heroTitle: "Impara in modo più intelligente, ",
@@ -710,7 +718,8 @@ export const translations: Record<string, any> = {
     landingGlobalDesc: "Crediamo che l'istruzione debba essere accessibile nella lingua che parli a casa. La nostra AI supporta diverse lingue.",
     landingCtaTitle: "Pronto per superare il tuo prossimo esame?",
     landingCtaBtn: "Inizia a Studiare Ora",
-    landingCtaNote: "Nessun account richiesto. Tutor AI orientato alla privacy."
+    landingCtaNote: "Nessun account richiesto. Tutor AI orientato alla privacy.",
+    leaderboardTitle: "Cronologia"
   },
   pt: {
     heroTitle: "Aprenda de forma mais inteligente, ",
@@ -790,6 +799,7 @@ export const translations: Record<string, any> = {
     landingGlobalDesc: "Acreditamos que a educação deve ser acessível no idioma que você fala em casa. Nossa AI suporta vários idiomas.",
     landingCtaTitle: "Pronto para arrasar no seu próximo exame?",
     landingCtaBtn: "Comece a Estudar Agora",
-    landingCtaNote: "Nenhuma conta necessária. Tutor de IA com foco em privacidade."
+    landingCtaNote: "Nenhuma conta necessária. Tutor de IA com foco em privacidade.",
+    leaderboardTitle: "Histórico"
   }
 };

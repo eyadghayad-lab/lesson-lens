@@ -141,6 +141,13 @@ const App: React.FC = () => {
   }, [userAnswers, currentQuizIndex, quizResult, currentLessonId]);
 
   const handleStartApp = () => {
+    setActiveTab('study');
+    navigate('/app');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleShowHistory = () => {
+    setActiveTab('history');
     navigate('/app');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -539,7 +546,7 @@ const App: React.FC = () => {
       />
       
       <Routes>
-        <Route path="/" element={<LandingPage onStart={handleStartApp} onShowLeaderboard={() => setActiveTab('history')} selectedLanguage={selectedLanguage} />} />
+        <Route path="/" element={<LandingPage onStart={handleStartApp} onShowLeaderboard={handleShowHistory} selectedLanguage={selectedLanguage} />} />
         <Route path="/app" element={
           <main className="max-w-4xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* iOS Install Guide */}
