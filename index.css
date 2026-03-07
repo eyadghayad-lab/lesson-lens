@@ -44,6 +44,8 @@ html, body {
   padding-right: var(--safe-right);
   min-height: 100%;
   transition: background-color 0.4s ease, color 0.4s ease;
+  overscroll-behavior-y: none; /* Prevents pull-to-refresh on mobile */
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
