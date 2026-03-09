@@ -27,9 +27,15 @@ const GRADES = [
 const App: React.FC = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    if (saved !== null) return saved === 'true';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    try {
+      const saved = localStorage.getItem('darkMode');
+      if (saved !== null) return saved === 'true';
+    } catch (e) {}
+    try {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch (e) {
+      return false;
+    }
   });
   const [inputText, setInputText] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<FileAsset[]>([]);
@@ -96,7 +102,9 @@ const App: React.FC = () => {
         StatusBar.setBackgroundColor({ color: '#fdfaff' });
       }
     }
-    localStorage.setItem('darkMode', darkMode.toString());
+    try {
+      localStorage.setItem('darkMode', darkMode.toString());
+    } catch (e) {}
   }, [darkMode, selectedLanguage]);
 
   useEffect(() => {

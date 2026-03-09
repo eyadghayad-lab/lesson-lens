@@ -2,7 +2,7 @@
 import { GoogleGenAI, Modality, Type } from "@google/genai";
 import { FileAsset, QuizQuestion } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 // Helper to convert FileAsset to Gemini Part
 const fileToPart = (file: FileAsset) => {
