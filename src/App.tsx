@@ -4,7 +4,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { Capacitor } from '@capacitor/core';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import Header from './components/Header';
 import LandingPage from './components/LandingPage';
@@ -68,6 +68,7 @@ const App: React.FC = () => {
   const recognitionRef = useRef<any>(null);
   const chapterRef = useRef<HTMLDivElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+  const quizRef = useRef<HTMLDivElement>(null);
 
   const t = translations[selectedLanguage.code] || translations.en;
   const isRTL = selectedLanguage.code.startsWith('ar') || selectedLanguage.code === 'fa';
@@ -740,8 +741,9 @@ const App: React.FC = () => {
               <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
                 <h3 className="text-xl md:text-2xl font-bold">{t.yourExplanation}</h3>
                 <div className="flex flex-wrap gap-2">
-                  <button onClick={() => handleDownloadPDF(resultRef, 'lesson')} className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-100 transition-all active:scale-95" title={t.downloadPdf}>
-                    <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  <button onClick={() => handleDownloadPDF(resultRef, 'lesson')} className="flex items-center gap-2 px-4 py-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-100 transition-all active:scale-95" title={t.downloadPdf}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    <span className="text-xs font-bold hidden sm:inline">{t.downloadPdf}</span>
                   </button>
                   <button onClick={handleShare} className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95" title={t.shareBtn}>
                     <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
@@ -868,7 +870,7 @@ const App: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 border border-purple-100 dark:border-purple-900/30 shadow-xl">
+                <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 border border-purple-100 dark:border-purple-900/30 shadow-xl" ref={quizRef}>
                   <div className="flex flex-col items-center text-center mb-8">
                     <div className="w-24 h-24 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center mb-6 border-4 border-purple-200 dark:border-purple-800">
                       <span className="text-3xl font-black">
@@ -899,6 +901,13 @@ const App: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center">
+                    <button 
+                      onClick={() => handleDownloadPDF(quizRef, 'quiz-results')}
+                      className="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                      {t.downloadPdf}
+                    </button>
                     <button 
                       onClick={() => {
                         setCurrentQuizIndex(0);
