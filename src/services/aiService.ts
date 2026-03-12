@@ -143,8 +143,9 @@ export const fetchCurriculum = async (country: string, grade: string, langName: 
     model: "gemini-3-flash-preview",
     contents: `List the standard school subjects and their primary textbooks for ${grade} in ${country}. 
     Provide the response in ${langName}. 
-    Include the book title, a brief description of what it covers, and search for a direct link to the official PDF of the textbook. 
-    The pdfUrl MUST be a direct link ending in .pdf from an official ministry or educational website. If you cannot find a direct .pdf link, leave it empty.`,
+    Include the book title, a brief description of what it covers, and search for a direct link to the PDF of the textbook. 
+    The pdfUrl should be a direct link ending in .pdf. Search official ministry websites first, but if not found, search unofficial educational repositories, archives, or trusted educational websites (like archive.org, scribd, or local educational portals). 
+    If you cannot find a direct .pdf link, leave it empty.`,
     config: {
       tools: [{ googleSearch: {} }],
       responseMimeType: "application/json",
