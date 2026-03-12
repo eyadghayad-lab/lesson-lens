@@ -72,6 +72,7 @@ const App: React.FC = () => {
   const t = translations[selectedLanguage.code] || translations.en;
   const isRTL = selectedLanguage.code.startsWith('ar') || selectedLanguage.code === 'fa';
   const isArabic = selectedLanguage.code.startsWith('ar');
+  const isApiKeyMissing = !process.env.GEMINI_API_KEY;
 
   useEffect(() => {
     const baseName = isRTL ? (isArabic ? 'بستطهالك' : 'LessonLens') : 'LessonLens';
@@ -552,6 +553,20 @@ const App: React.FC = () => {
         setSelectedLanguage={setSelectedLanguage}
         onGoHome={handleGoHome}
       />
+      
+      {isApiKeyMissing && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-lg bg-red-500 text-white p-4 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-500 flex items-start gap-4 border-2 border-white/20 backdrop-blur-md">
+          <div className="bg-white/20 p-2 rounded-xl">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          </div>
+          <div className="flex-1 text-left">
+            <p className="font-black text-sm uppercase tracking-wider mb-1">API Key Missing</p>
+            <p className="text-xs opacity-90 leading-relaxed">
+              The Gemini API key is not set. If you are running this on GitHub, please set the <code className="bg-white/20 px-1 rounded">GEMINI_API_KEY</code> in your environment or GitHub Secrets.
+            </p>
+          </div>
+        </div>
+      )}
       
       <Routes>
         <Route path="/" element={<LandingPage onStart={handleStartApp} onShowLeaderboard={handleShowHistory} selectedLanguage={selectedLanguage} />} />
